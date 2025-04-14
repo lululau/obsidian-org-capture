@@ -1,0 +1,10 @@
+{
+	"id": "obsidian-org-capture",
+	"name": "Org Capture",
+	"version": "1.0.0",
+	"minAppVersion": "0.12.0",
+	"description": "Capture current note title and Obsidian URL as an Emacs org-mode link.",
+	"author": "Your Name",
+	"authorUrl": "",
+	"isDesktopOnly": true
+}
