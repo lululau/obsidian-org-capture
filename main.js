@@ -47,6 +47,13 @@ var OrgCapture = class extends import_obsidian.Plugin {
         this.captureCurrentNote();
       }
     });
+    this.addCommand({
+      id: "org-journal-capture-current-node",
+      name: "Insert last captured link into Emacs Org-Journal",
+      callback: () => {
+        this.insertLastStoredLink();
+      }
+    });
     this.addSettingTab(new OrgCaptureSettingTab(this.app, this));
   }
   onunload() {
@@ -68,6 +75,30 @@ var OrgCapture = class extends import_obsidian.Plugin {
     const obsidianUrl = `obsidian://open?vault=${encodeURIComponent(vaultName)}&file=${encodeURIComponent(activeFile.path)}`;
     const orgLink = `[[${obsidianUrl}][${title}]]`;
     const command = `${this.settings.emacsclientPath} -e '(add-to-list '"'"'org-stored-links (list "${obsidianUrl}" "${title}"))'`;
+    (0, import_child_process.exec)(command, (error, stdout, stderr) => {
+      if (error) {
+        console.error(`exec error: ${error}`);
+        new import_obsidian.Notice(`Error running emacsclient: ${error.message}`);
+        return;
+      }
+      if (stderr) {
+        console.error(`stderr: ${stderr}`);
+      }
+      console.log(`stdout: ${stdout}`);
+      new import_obsidian.Notice(`Captured link for: ${title}`);
+    });
+  }
+  insertLastStoredLink() {
+    const activeFile = this.app.workspace.getActiveFile();
+    if (!activeFile) {
+      new import_obsidian.Notice("No active file");
+      return;
+    }
+    const title = activeFile.basename;
+    const vaultName = this.app.vault.getName();
+    const obsidianUrl = `obsidian://open?vault=${encodeURIComponent(vaultName)}&file=${encodeURIComponent(activeFile.path)}`;
+    const orgLink = `[[${obsidianUrl}][${title}]]`;
+    const command = `${this.settings.emacsclientPath} -e '(progn (add-to-list '"'"'org-stored-links (list "${obsidianUrl}" "${title}")) (org-journal-new-entry nil) (org-insert-last-stored-link 1))'`;
     (0, import_child_process.exec)(command, (error, stdout, stderr) => {
       if (error) {
         console.error(`exec error: ${error}`);
