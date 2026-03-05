@@ -89,7 +89,7 @@ export default class OrgCapture extends Plugin {
 		const obsidianUrl = `obsidian://open?vault=${encodeURIComponent(vaultName)}&file=${encodeURIComponent(activeFile.path)}`;
 		const orgLink = `[[${obsidianUrl}][${title}]]`;
 
-    const command = `${this.settings.emacsclientPath} -e '(progn (add-to-list '"'"'org-stored-links (list "${obsidianUrl}" "${title}")) (with-selected-window (selected-window) (org-journal-new-entry nil)) (org-insert-all-links 1 "" "") (org-set-tags ":Obsidian:"))'`;
+    const command = `${this.settings.emacsclientPath} -e '(with-selected-window (selected-window) (progn (add-to-list '"'"'org-stored-links (list "${obsidianUrl}" "${title}")) (org-journal-new-entry nil) (org-insert-all-links 1 "" "") (org-set-tags ":Obsidian:")))'`;
 
 		exec(command, (error, stdout, stderr) => {
 			if (error) {
